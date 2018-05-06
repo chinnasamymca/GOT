@@ -46,11 +46,6 @@ class KingsListInteractor: KingsListUseCase {
             let attackerBattle = BattleDetails(name: nameOfBattle, year: year, againstKing: defenderKing, attacked: true, isWon: isAttackerWon)
             attackerKingModel.king.battels.append(attackerBattle)
             
-            // rating for Attacker
-            let attackerRating = self.getNewRatingFor(king: attackerKingModel.king, isWon: isAttackerWon)
-            attackerKingModel.king.rating = attackerRating.newRating
-            attackerKingModel.king.points = attackerRating.newPoints
-            
             let defenderKingModel = self.getKingModel(kingName: defenderKing, kingsList: kingsModelList)
             if defenderKingModel.isNew == true {
                 kingsModelList.append(defenderKingModel.king)
@@ -60,10 +55,10 @@ class KingsListInteractor: KingsListUseCase {
             let defenderBattle = BattleDetails(name: nameOfBattle, year: year, againstKing: attackerKing, attacked: false, isWon: !isAttackerWon)
             defenderKingModel.king.battels.append(defenderBattle)
             
-            // rating for defender
-            let defenderRating = self.getNewRatingFor(king: defenderKingModel.king, isWon: !isAttackerWon)
-            defenderKingModel.king.rating = defenderRating.newRating
-            defenderKingModel.king.points = defenderRating.newPoints
+            // Update Rating
+            let rating = self.getNewRatingFor(attacker: attackerKingModel.king, defender: defenderKingModel.king, isAttackerWon: isAttackerWon)
+            attackerKingModel.king.points = rating.newAttackerPoints
+            defenderKingModel.king.points = rating.newDefenderPoints
         }
         return kingsModelList
     }
@@ -78,17 +73,45 @@ class KingsListInteractor: KingsListUseCase {
         }
     }
     
-    func getNewRatingFor(king: KingsModel, isWon: Bool) -> (newRating: Double, newPoints: Int) {
+    func getNewRatingFor(attacker: KingsModel, defender:KingsModel, isAttackerWon: Bool) -> (newAttackerPoints: Int, newDefenderPoints: Int) {
     
         // Calculating new rating
-        var points = king.points!
-        if isWon == true {
-            points += 400
+        let currentPointsAttacker = attacker.points!
+        let currentPointsDefender = defender.points!
+        
+        // Step 1
+//        R(1) = 10^(r(1)/400)
+//        R(2) = 10^(r(2)/400)
+        let attackerPoint = 10^(currentPointsAttacker/400)
+        let defenderPoint = 10^(currentPointsDefender/400)
+        
+        // Step 2
+//        E(1) = R(1) / (R(1) + R(2))
+//        E(2) = R(2) / (R(1) + R(2))
+        let attackerExpectedScore = (attackerPoint / (attackerPoint + defenderPoint))
+        let defenderExpectedScore = (defenderPoint / (attackerPoint + defenderPoint))
+        
+        // Step 3
+//        S(1) = 1 if player 1 wins / 0.5 if draw / 0 if player 2 wins
+//        S(2) = 0 if player 1 wins / 0.5 if draw / 1 if player 2 wins
+        var attackerWiningScore = 0
+        var defenderWiningScore = 0
+        if isAttackerWon == true {
+            attackerWiningScore = 1
+            defenderWiningScore = 0
         }
         else {
-            points -= 400
+            attackerWiningScore = 0
+            defenderWiningScore = 1
         }
-        let newRating = (points/king.battels.count)
-        return (Double(newRating), points)
+        
+        // Step 4
+//        r'(1) = r(1) + K * (S(1) – E(1))
+//        r'(2) = r(2) + K * (S(2) – E(2))
+        let constantRating = 32
+        let newAttackerPoint = currentPointsAttacker + constantRating * (attackerWiningScore - attackerExpectedScore)
+        let newDefenderPoint = currentPointsDefender + constantRating * (defenderWiningScore - defenderExpectedScore)
+    
+        return (newAttackerPoint, newDefenderPoint)
     }
 }

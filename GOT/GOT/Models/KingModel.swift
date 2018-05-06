@@ -12,13 +12,12 @@ class KingsModel {
     var kingName: String!
     var kingImage: String!
     var points: Int!
-    var rating: Double = 0.0
     
     var battels = Array<BattleDetails>()
     
     init(name: String) {
         self.kingName = name
-        self.points = 1000
+        self.points = 400
         self.kingImage = self.randomKingImage()
     }
     
