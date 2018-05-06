@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SVProgressHUD
 
 class KingsListViewController: UIViewController {
     
@@ -33,6 +34,7 @@ class KingsListViewController: UIViewController {
         self.tableView.delegate = self
         self.tableView.dataSource = self
         
+        SVProgressHUD.show()
     }
 
     override func didReceiveMemoryWarning() {
@@ -42,6 +44,7 @@ class KingsListViewController: UIViewController {
     
     
     func configureView() {
+        SVProgressHUD.dismiss()
         self.titleLable.text = self.kingsListViewModel?.title
         self.tableView.reloadData()
     }
@@ -60,7 +63,9 @@ class KingsListViewController: UIViewController {
 extension KingsListViewController: KingsListView {
     func updateKingsList(viewModel: KingsListViewModel) {
         // Update UI
-        self.kingsListViewModel = viewModel
+        DispatchQueue.main.async {
+            self.kingsListViewModel = viewModel
+        }
     }
     
     func moveToNextScreen(view: UIViewController) {
@@ -76,6 +81,7 @@ extension KingsListViewController: KingsListView {
             })
             alertViewController.addAction(okButton)
             self.present(alertViewController, animated: true, completion: nil)
+            SVProgressHUD.dismiss()
         }
     }
 }

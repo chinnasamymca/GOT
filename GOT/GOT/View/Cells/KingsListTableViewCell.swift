@@ -33,6 +33,8 @@ class KingsListTableViewCell: UITableViewCell {
         self.numberOfWonLable.text = "\(kingModel!.getNumberofWin())"
         self.imageView?.image = UIImage(named: (kingModel?.kingImage)!)
         
+        let rating = kingModel?.rating
+        self.kingRatingLable.text = "\(rating!)"
         self.numberOfAttachedLable.text = "\(kingModel!.getNumberOfAttacked())"
         self.numberOfDefendedLable.text = "\(kingModel!.getNumberOfDefended())"
     }

@@ -26,4 +26,14 @@ class GTOTestingExample: XCTestCase {
         XCTAssertEqual(king.points, 1000)
     }
     
+    func testRatingOfKing() {
+        let king = KingsModel(name: "Chinna")
+        let battle = BattleDetails(name: "Sample", year: "2018", againstKing: "Mavenir", attacked: true, isWon: true)
+        king.battels.append(battle)
+        let interactor = KingsListInteractor()
+        
+        XCTAssertGreaterThan(interactor.getNewRatingFor(king: king, isWon: true), 0.0)
+        //XCTAssertLessThan(interactor.getNewRatingFor(king: king, isWon: true), 0.0)
+    }
+    
 }

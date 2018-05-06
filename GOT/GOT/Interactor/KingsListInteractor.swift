@@ -48,7 +48,8 @@ class KingsListInteractor: KingsListUseCase {
             
             // rating for Attacker
             let attackerRating = self.getNewRatingFor(king: attackerKingModel.king, isWon: isAttackerWon)
-            attackerKingModel.king.rating = attackerRating
+//            attackerKingModel.king.rating = attackerRating.newRating
+//            attackerKingModel.king.points = attackerRating.newPoints
             
             let defenderKingModel = self.getKingModel(kingName: defenderKing, kingsList: kingsModelList)
             if defenderKingModel.isNew == true {
@@ -61,7 +62,8 @@ class KingsListInteractor: KingsListUseCase {
             
             // rating for defender
             let defenderRating = self.getNewRatingFor(king: defenderKingModel.king, isWon: !isAttackerWon)
-            defenderKingModel.king.rating = defenderRating
+//            defenderKingModel.king.rating = defenderRating.newRating
+//            defenderKingModel.king.points = defenderRating.newPoints
         }
         return kingsModelList
     }
@@ -76,11 +78,19 @@ class KingsListInteractor: KingsListUseCase {
         }
     }
     
+    //func getNewRatingFor(king: KingsModel, isWon: Bool) -> (newRating: Double, newPoints: Int) {
     func getNewRatingFor(king: KingsModel, isWon: Bool) -> Double {
-        var newRating = king.rating
         
         // Calculating new rating
-        
-        return newRating
+        var points = king.points!
+        if isWon == true {
+            points += 400
+        }
+        else {
+            points -= 400
+        }
+        let newRating = (points/king.battels.count)
+        return Double(newRating)
+        //return (Double(newRating), points)
     }
 }
